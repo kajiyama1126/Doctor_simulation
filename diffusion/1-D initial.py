@@ -242,7 +242,13 @@ class Make_Matrix(object):
 
 
 if __name__=='__main__':
-    n= 9
+    pos = []
+    for i in range(7):
+        for j in range(7):
+            pos_i = [i+1,j+1]
+            pos.append(pos_i)
+    n= len(pos)
+    # n= 9
 
     x = 5
     y = 5
@@ -251,11 +257,12 @@ if __name__=='__main__':
     y_div = 10
     D = 2.8*(1e-3 )*5
     delta_t = 0.04
+    # iteration = 1000
     iteration = 1000
-
     # pos = [[5,5],[4,6],[6,4]]
     # pos = [[5,5],[4,6],[6,4],[2,8],[8,2],[2,2],[8,8],[6,6],[4,4],[10,10],[13,13],[15,15],[18,12],[12,18]]
-    pos = [[5,5],[4,6],[6,4],[2,7],[7,2],[2,2],[7,7],[6,6],[4,4]]
+    # pos = [[5,5],[4,6],[6,4],[2,7],[7,2],[2,2],[7,7],[6,6],[4,4]]
+
     phi = []
     Omega = []
     for i in range(n):
@@ -317,7 +324,7 @@ if __name__=='__main__':
         A.append(A_i)
         b.append(b_i)
     lam = 0.0
-    
+
     from agent.agent import Agent_harnessing_diffusion
     Agent = []
 
@@ -325,12 +332,12 @@ if __name__=='__main__':
     weight = [1/n for i in range(n)]
     # weight = [1]
     for i in range(n):
-        agent = Agent_harnessing_diffusion(n,(x_div-1)*(y_div-1),A[i],b[i],eta=0.0005,weight = weight ,name=i,lam = lam)
+        agent = Agent_harnessing_diffusion(n,(x_div-1)*(y_div-1),A[i],b[i],eta=0.00002,weight = weight ,name=i,lam = lam)
         Agent.append(agent)
 
 
 
-    for k in range(100000):
+    for k in range(10000):
         print(k)
         for i in range(n):
             for j in range(n):
@@ -349,14 +356,14 @@ if __name__=='__main__':
     estimate_diffusion = Agent[0].x_i
     estimate_diffusion = estimate_diffusion.reshape([x_div-1,y_div-1])
 
-    del_x = x/ x_div
-    del_y = y/ y_div
+    del_x = x/ (x_div-1)
+    del_y = y/ (y_div-1)
     x = np.arange(0, x, del_x)
     y = np.arange(0, y, del_y)
     X, Y = plt.meshgrid(x, y)
     Z = estimate_diffusion
 
-    plt.pcolor(X, Y, Z)
+    plt.pcolor(X, Y, Z.T)
     plt.colorbar()
     plt.show()
     # print(omega)
