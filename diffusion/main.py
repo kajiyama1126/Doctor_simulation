@@ -8,15 +8,6 @@ from diffusion.Diffsuion_matrix import Make_Matrix, Diffusion
 
 from agent.agent import Agent_harnessing
 
-class data_saver(object):
-    def __init__(self,pos,iteration):
-        self.dim = len(pos)
-        self.b = np.zeros(self.dim*iteration)
-
-    def get(self,value,iteration):
-        for i in range(self.dim):
-            self.b[self.dim * iteration + i]  = value[i]
-
 
 if __name__=='__main__':
     pos = []
@@ -32,12 +23,16 @@ if __name__=='__main__':
 
     x_div = 10
     y_div = 10
-    D = 2.8*(1e-3 )*5
+    D = 2.8*(1e-3 )*5*2*2
     delta_t = 0.04
+
+    delta_start = 100
+    delta_end = 200
     # iteration = 1000
-    iteration =100 # 拡散1回(初期状態ほぼ状態)
-    update_iteration = 2500 # エージェントの計算回数
-    eta = 0.001
+    iteration = delta_end-delta_start
+    update_iteration = 5000 # エージェントの計算回数
+    eta = 0.005
+    lam = 0.01
     # pos = [[5,5],[4,6],[6,4]]
     # pos = [[5,5],[4,6],[6,4],[2,8],[8,2],[2,2],[8,8],[6,6],[4,4],[10,10],[13,13],[15,15],[18,12],[12,18]]
     # pos = [[5,5],[4,6],[6,4],[2,7],[7,2],[2,2],[7,7],[6,6],[4,4]]
@@ -45,7 +40,7 @@ if __name__=='__main__':
     phi = []
     Omega = []
     for i in range(n):
-        omega = Make_Matrix(x,y,x_div,y_div,D,delta_t,iteration)
+        omega = Make_Matrix(x,y,x_div,y_div,D,delta_t,delta_start,delta_end)
         Omega.append(omega)
 
     for i in range(n):
@@ -61,7 +56,7 @@ if __name__=='__main__':
     # Map.make_initial_distribution()
     Map.make_initial_distribution2()
     # Map.draw3D()
-    # Map.draw2()
+    Map.draw2()
 
     # m = (x_div-1)*(y_div-1)
     # Omega = np.zeros(m,m)
@@ -72,6 +67,8 @@ if __name__=='__main__':
     #         for i in range(y_div-1):
     #             for j in range(y_div-1):
 
+    Map.update_2(iteration=delta_start)
+    Map.draw2()
     for i in range(n):
         x_pos = pos[i][0]
         y_pos = pos[i][1]
@@ -103,7 +100,7 @@ if __name__=='__main__':
         A.append(A_i)
         b.append(b_i)
     # lam = 0.0
-    lam = 0.1
+
 
     from agent.agent import Agent_harnessing_diffusion
     Agent = []
@@ -133,7 +130,7 @@ if __name__=='__main__':
         print(cost_value)
 
     print(agent.x_i)
-    estimate_diffusion = Agent[10].x_i
+    estimate_diffusion = Agent[0].x_i
     estimate_diffusion = estimate_diffusion.reshape([x_div-1,y_div-1])
 
     del_x = x/ (x_div-1)

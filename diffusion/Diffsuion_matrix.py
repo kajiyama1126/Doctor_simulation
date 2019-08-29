@@ -6,7 +6,7 @@ import copy
 
 
 class Make_Matrix(object):
-    def __init__(self,x,y,x_div,y_div,D,delta_t,iteration):
+    def __init__(self,x,y,x_div,y_div,D,delta_t,delta_start,delta_end):
         self.h_x = x
         self.h_y = y
         self.x_div = x_div-1
@@ -21,7 +21,9 @@ class Make_Matrix(object):
         self.gamma = 1-2*self.alpha - 2*self.beta
 
         self.m = self.x_div *self.y_div
-        self.iteration = iteration
+        self.delta_start = delta_start
+        self.delta_end = delta_end
+        self.iteration = (delta_end-delta_start)
 
     def make_omega_ij(self,i,j):
         if i==j:
@@ -73,6 +75,9 @@ class Make_Matrix(object):
         # self.R = np.dot(self.theta,self.omega_maxtrix)
         self.R = np.dot(self.theta, np.identity(self.m))
         omega_dot = self.omega_maxtrix
+        for i in range(self.delta_start):
+            omega_dot = np.dot(omega_dot,self.omega_maxtrix)
+
         for i in range(self.iteration-1):
             print(i)
             omega_dot = np.dot(omega_dot,self.omega_maxtrix)
@@ -120,7 +125,7 @@ class Diffusion(object):
         # tmp = math.exp(-0.1*((x-15)**2 + (y-10)**2))
         # tmp1 = 0.5* math.exp(-0.2*((x-5)**2+(y-15)**2))
         initial = 0.6*math.exp(-3.0*((x-3.4)**2 + (y-1.6)**2))
-        initial2 = 0.8*math.exp(-2.0*((x-3.4)**2+(y-2.8)**2))
+        initial2 = 0.8*math.exp(-2.0*((x-1.6)**2+(y-2.8)**2))
         return initial+initial2
 
     def make_initial_distribution2(self):
