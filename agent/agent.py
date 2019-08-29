@@ -91,7 +91,7 @@ class Agent_harnessing_diffusion(Agent_harnessing):
 #     def local_opt(self):
     def update(self, k):
         self.x[self.name] = self.x_i
-        self.v[self.name] = self.v_i.reshape([1,-1])
+        self.v[self.name] = self.v_i
         grad_bf = self.grad()
         self.x_i = 0
         for i in range(self.n):
@@ -103,8 +103,10 @@ class Agent_harnessing_diffusion(Agent_harnessing):
             self.v_i += self.weight[i] * self.v[i]
         self.v_i = self.v_i+ (self.grad() - grad_bf)
         # print(self.v_i)
-        # self.x_i = np.dot(self.weight, self.x)) - self.eta * self.v_i
-        # self.v_i = np.dot(self.weight, self.v) + (self.grad() - grad_bf)
+        #
+        # self.x_i = np.dot(np.kron(self.weight,np.identity(self.m)),self.x) - self.eta * self.v_i
+        #
+        # self.v_i = np.dot(np.kron(self.weight, np.identity(self.m)),self.x)+ (self.grad() - grad_bf)
 
 
 
