@@ -30,13 +30,14 @@ if __name__=='__main__':
     x = 5
     y = 5
 
-    x_div = 25
-    y_div = 25
+    x_div = 10
+    y_div = 10
     D = 2.8*(1e-3 )*5
     delta_t = 0.04
     # iteration = 1000
-    iteration =1
-    update_iteration = 2500
+    iteration =100 # 拡散1回(初期状態ほぼ状態)
+    update_iteration = 2500 # エージェントの計算回数
+    eta = 0.001
     # pos = [[5,5],[4,6],[6,4]]
     # pos = [[5,5],[4,6],[6,4],[2,8],[8,2],[2,2],[8,8],[6,6],[4,4],[10,10],[13,13],[15,15],[18,12],[12,18]]
     # pos = [[5,5],[4,6],[6,4],[2,7],[7,2],[2,2],[7,7],[6,6],[4,4]]
@@ -111,7 +112,7 @@ if __name__=='__main__':
     weight = [1/n for i in range(n)]
     # weight = [1]
     for i in range(n):
-        agent = Agent_harnessing_diffusion(n,(x_div-1)*(y_div-1),A[i],b[i],eta=0.0025,weight = weight ,name=i,lam = lam)
+        agent = Agent_harnessing_diffusion(n,(x_div-1)*(y_div-1),A[i],b[i],eta=eta ,weight = weight ,name=i,lam = lam)
         Agent.append(agent)
 
 

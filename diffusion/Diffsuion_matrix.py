@@ -58,8 +58,8 @@ class Make_Matrix(object):
         y = pos[1]
 
         self.theta = np.zeros([self.dim,self.m])
-        mu = x*self.y_div + y -1
-        nu = (x-1)*self.y_div + y -1
+        mu = (x+1)*self.y_div + y
+        nu = x*self.y_div + y
         for i in range(self.dim):
             for j in range(self.m):
                 if (((i ==0) and (j==mu)) or ((i==1 and j==nu+1))):
