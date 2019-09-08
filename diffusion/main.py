@@ -40,12 +40,12 @@ if __name__=='__main__':
     delta_t = 0.04
 
     delta_start = 5
-    delta_end = 250
+    delta_end = 5
     # iteration = 1000
     iteration = delta_end-delta_start
-    update_iteration = 50000 # エージェントの計算回数
-    eta = 0.0025
-    lam = 0.01
+    update_iteration = 10000 # エージェントの計算回数
+    eta = 0.02
+    lam = 0.05
     # pos = [[5,5],[4,6],[6,4]]
     # pos = [[5,5],[4,6],[6,4],[2,8],[8,2],[2,2],[8,8],[6,6],[4,4],[10,10],[13,13],[15,15],[18,12],[12,18]]
     # pos = [[5,5],[4,6],[6,4],[2,7],[7,2],[2,2],[7,7],[6,6],[4,4]]
