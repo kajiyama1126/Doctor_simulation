@@ -78,13 +78,13 @@ class Make_Matrix(object):
         for i in range(self.delta_start):
             omega_dot = np.dot(omega_dot,self.omega_maxtrix)
 
-        for i in range(self.iteration-1):
-            print(i)
+        for i in range(self.iteration):
+            # print(i)
             omega_dot = np.dot(omega_dot,self.omega_maxtrix)
             self.R = np.concatenate([self.R,np.dot(self.theta,omega_dot)])
 
     def make_Psi(self):
-        diag_list = []
+        diag_list = [1.0/self.del_x,1.0/self.del_y]
         for i in range((self.iteration)):
             diag_list.append(1.0/self.del_x)
             diag_list.append(1.0/self.del_y)
