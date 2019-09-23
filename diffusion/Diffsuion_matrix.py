@@ -49,7 +49,6 @@ class Make_Matrix(object):
                 omega_ij = self.make_omega_ij(i,j)
                 # for i1 in range(self.y_div):
                 #     for j1 in range(self.y_div):
-                i
                 for i1 in range(self.y_div):
                     for j1 in range(self.y_div):
                         self.omega_maxtrix[i*self.y_div+i1][j*self.y_div+j1] = omega_ij[i1][j1]

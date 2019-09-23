@@ -34,11 +34,11 @@ class Problem_L2(Problem):
         self.lam = lam
 
     def solve(self):
-        # A_matrix = np.array(self.A[0])
-        #         # b_matrix = np.array(self.b[0])
-        #         # for i in range(self.n-1):
-        #         #     A_matrix = np.vstack((A_matrix,self.A[i+1]))
-        #         #     b_matrix = np.vstack((b_matrix, self.b[i + 1]))
+        A_matrix = np.array(self.A[0])
+        b_matrix = np.array(self.b[0])
+        for i in range(self.n-1):
+            A_matrix = np.vstack((A_matrix,self.A[i+1]))
+            b_matrix = np.vstack((b_matrix, self.b[i + 1]))
 
         # print(cvx.installed_solvers())
         n, m = self.n, self.m
@@ -46,8 +46,9 @@ class Problem_L2(Problem):
         obj = cvx.Minimize(0)
         # obj += cvx.Minimize(0)
         for i in range(n):
-            tmp = self.A[i]*self.x
-            obj += cvx.Minimize(cvx.sum_squares(tmp - self.b[i]))
+            # tmp = self.A[i]*self.x
+            obj = cvx.Minimize(cvx.sum_squares(A_matrix * self.x - b_matrix))
+            # obj += cvx.Minimize(cvx.sum_squares(tmp - self.b[i]))
             # obj+=cvx.Minimize(1 / 2 * cvx.power(cvx.norm((self.A[i]*self.x - self.b[i]), 2), 2))
         obj += cvx.Minimize(1 / 2 * n * self.lam * cvx.power(cvx.norm((self.x), 2), 2))
         #                  + 1 / 2 * n * self.lam * cvx.power(cvx.norm((self.x), 2), 2))
