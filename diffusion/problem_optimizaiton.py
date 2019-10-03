@@ -29,10 +29,10 @@ class Problem(object):
         return self.x.value
 
 class Problem_L2(Problem):
-    def __init__(self,n,m,A,b,lam):
+    def __init__(self,n,m,A,b,lam,b_m):
         super(Problem_L2,self).__init__(n,m,A,b)
         self.lam = lam
-
+        self.b_m = b_m
     def solve(self):
         A_matrix = np.array(self.A[0])
         b_matrix = np.array(self.b[0])
@@ -43,13 +43,13 @@ class Problem_L2(Problem):
 
         # print(cvx.installed_solvers())
         n, m = self.n, self.m
-        b_matrix = b_matrix.reshape(2*n)
+        b_matrix = b_matrix.reshape(self.b_m)
         self.x = cvx.Variable(m)
         obj = cvx.Minimize(0)
         # obj += cvx.Minimize(0)
         for i in range(n):
             # tmp = self.A[i]*self.x
-            obj = cvx.Minimize(cvx.sum_squares(A_matrix * self.x - b_matrix))
+            obj = cvx.Minimize(cvx.sum_squares(A_matrix * self.x - b_matrix))+self.lam*cvx.Minimize(cvx.sum_squares(self.x))
             # obj = cvx.Minimize(cvx.sum_squares(A_matrix * self.x ))
             # obj += cvx.Minimize(cvx.sum_squares(tmp - self.b[i]))
             # obj+=cvx.Minimize(1 / 2 * cvx.power(cvx.norm((self.A[i]*self.x - self.b[i]), 2), 2))

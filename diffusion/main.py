@@ -124,7 +124,7 @@ if __name__=='__main__':
     # # lam = 0.0
 
     from diffusion.problem_optimizaiton import Problem_L2
-    Optimization = Problem_L2(n,m,A,b,lam)
+    Optimization = Problem_L2(n,m,A,b,lam,2*n*(iteration+1))
     Optimization.solve()
     optimal_value = Optimization.send_f_opt()
 
