@@ -144,14 +144,15 @@ if __name__=='__main__':
     plt.show()
 
 
-    from agent.agent import Agent_harnessing_diffusion
+    from agent.agent import Agent_harnessing_diffusion,Agent_harnessing_diffusion_quantized
     Agent = []
 
     # weight =[1/3,1/3,1/3]
     weight = [1/n for i in range(n)]
     # weight = [1]
     for i in range(n):
-        agent = Agent_harnessing_diffusion(n,m,A[i],b[i],eta=eta ,weight = weight ,name=i,lam = lam)
+        # agent = Agent_harnessing_diffusion(n,m,A[i],b[i],eta=eta ,weight = weight ,name=i,lam = lam)
+        agent = Agent_harnessing_diffusion_quantized(n,m,A[i],b[i],eta=eta ,weight = weight ,name=i,lam = lam)
         Agent.append(agent)
 
 

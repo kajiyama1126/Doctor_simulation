@@ -108,7 +108,56 @@ class Agent_harnessing_diffusion(Agent_harnessing):
         #
         self.v_i =  np.dot(self.weight,self.v.reshape([self.n,self.m])) + (self.grad() - grad_bf)
 
+class Agent_harnessing_diffusion_quantized(Agent_harnessing_diffusion):
+    def __init__(self, n, m, A, b, eta, weight, name,lam):
+        super(Agent_harnessing_diffusion_quantized, self).__init__(n, m, A, b,eta, weight, name,lam)
+        self.Encoder = Encoder_diffusion(self.n, self.m)
+        self.Decoder = Decoder_diffusion(self.n, self.m)
+        self.x_E = np.zeros([n,1, m])
+        self.v_E = np.zeros([n,1, m])
+        self.x_D = np.zeros([n,1, m])
+        self.v_D = np.zeros([n,1, m])
+        self.h_x = 1
+        self.h_v = 1
 
+    def make_h(self,k):
+        self.h_x = self.h_x * 0.99
+        self.h_v = self.h_v * 0.99
+
+    def send(self, j):
+        if self.weight[j] == 0:
+            return None, j
+        else:
+            self.Encoder.x_encode(self.x_i, j, self.h_x)
+            self.Encoder.v_encode(self.v_i, j, self.h_v)
+            state, name = self.Encoder.send_y_z(j, self.name)
+            return state, name
+
+    def receive(self, x_j, name):
+        if x_j is None:
+            pass
+        else:
+            self.Decoder.get_y_z(x_j, name)
+            self.Decoder.x_decode(name, self.h_x)
+            self.Decoder.v_decode(name, self.h_v)
+
+    def update(self, k):
+        self.x_E, self.v_E = self.Encoder.send_x_E_v_E()
+        self.x_D, self.v_D = self.Decoder.send_x_D_v_D()
+        x = self.x_D - self.x_E
+        x[self.name] = np.zeros(self.m)
+        v = self.v_D - self.v_E
+        v[self.name] = np.zeros(self.m)
+
+        grad_bf = self.grad()
+        # self.x_i = np.dot(self.weight,self.x.reshape([self.n,self.m])) - self.eta * self.v_i
+        # #
+        # self.v_i =  np.dot(self.weight,self.v.reshape([self.n,self.m])) + (self.grad() - grad_bf)
+
+        self.x_i = self.x_i + np.dot(self.weight,self.x.reshape([self.n,self.m])) - self.eta * self.v_i
+        self.v_i = self.v_i + np.dot(self.weight,self.x.reshape([self.n,self.m])) + (self.grad() - grad_bf)
+
+        self.make_h(k)
 
 class Agent_harnessing_quantize(Agent_harnessing):
     def __init__(self, n, m, A, b,eta, weight, name):
@@ -208,6 +257,69 @@ class Decoder(object):
 
         self.y = np.zeros([n, m])
         self.z = np.zeros([n, m])
+
+    def get_y_z(self, state, j):
+        self.y[j] = state[0]
+        self.z[j] = state[1]
+
+    def x_decode(self, j, h_x):
+        self.x_D[j] = h_x * self.y[j] + self.x_D[j]
+
+    def v_decode(self, j, h_v):
+        self.v_D[j] = h_v * self.z[j] + self.v_D[j]
+
+    def send_x_v(self, name):
+        return self.x_D[name], self.v_D[name]
+
+    def send_x_D_v_D(self):
+        return self.x_D, self.v_D
+
+class Encoder_diffusion(object):
+    def __init__(self, n, m):
+        self.n = n
+        self.m = m
+        self.x_E = np.zeros([n,1, m])
+        self.v_E = np.zeros([n,1, m])
+
+        self.y = np.zeros([n,1, m])
+        self.z = np.zeros([n,1, m])
+
+    def x_encode(self, x_i, j, h_x):
+        tmp = (x_i - self.x_E[j]) / h_x
+        # print(tmp,x_i - self.x_E[j],h_x)
+        self.y[j] = self.quantize(tmp)
+        self.x_E[j] = h_x * self.y[j] + self.x_E[j]
+
+    def v_encode(self, v_i, j, h_v):
+        tmp = (v_i - self.v_E[j]) / h_v
+        self.z[j] = self.quantize(tmp)
+        self.v_E[j] = h_v * self.z[j] + self.v_E[j]
+
+    def send_y_z(self, j, name):
+        return (self.y[j], self.z[j]), name
+
+    def send_x_E_v_E(self):
+        # print(self.x_E, self.v_E)
+        return self.x_E, self.v_E
+
+    def send_x_v(self, name):
+        return self.x_E[name], self.v_E[name]
+
+    def quantize(self, x_i):
+        tmp = np.around(x_i)
+        # print(max(tmp))
+        return tmp
+
+
+class Decoder_diffusion(object):
+    def __init__(self, n, m):
+        self.n = n
+        self.m = m
+        self.x_D = np.zeros([n,1, m])
+        self.v_D = np.zeros([n,1, m])
+
+        self.y = np.zeros([n,1, m])
+        self.z = np.zeros([n,1, m])
 
     def get_y_z(self, state, j):
         self.y[j] = state[0]
