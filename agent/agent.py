@@ -121,12 +121,12 @@ class Agent_harnessing_diffusion_quantized(Agent_harnessing_diffusion):
         self.h_v = 1
 
     def make_h(self,k):
-        self.h_x = self.h_x * 0.99
-        self.h_v = self.h_v * 0.99
+        self.h_x = self.h_x*0.9
+        self.h_v = self.h_v*0.9
 
     def send(self, j):
         if self.weight[j] == 0:
-            return None, j
+            return None, self.name
         else:
             self.Encoder.x_encode(self.x_i, j, self.h_x)
             self.Encoder.v_encode(self.v_i, j, self.h_v)
@@ -145,17 +145,18 @@ class Agent_harnessing_diffusion_quantized(Agent_harnessing_diffusion):
         self.x_E, self.v_E = self.Encoder.send_x_E_v_E()
         self.x_D, self.v_D = self.Decoder.send_x_D_v_D()
         x = self.x_D - self.x_E
-        x[self.name] = np.zeros(self.m)
+        x[self.name] = np.zeros([1,self.m])
         v = self.v_D - self.v_E
-        v[self.name] = np.zeros(self.m)
+        v[self.name] = np.zeros([1,self.m])
+        print(x,v)
 
         grad_bf = self.grad()
         # self.x_i = np.dot(self.weight,self.x.reshape([self.n,self.m])) - self.eta * self.v_i
         # #
         # self.v_i =  np.dot(self.weight,self.v.reshape([self.n,self.m])) + (self.grad() - grad_bf)
 
-        self.x_i = self.x_i + np.dot(self.weight,self.x.reshape([self.n,self.m])) - self.eta * self.v_i
-        self.v_i = self.v_i + np.dot(self.weight,self.x.reshape([self.n,self.m])) + (self.grad() - grad_bf)
+        self.x_i = self.x_i + np.dot(self.weight,x.reshape([self.n,self.m])) - self.eta * self.v_i
+        self.v_i = self.v_i + np.dot(self.weight,v.reshape([self.n,self.m])) + (self.grad() - grad_bf)
 
         self.make_h(k)
 
@@ -211,68 +212,68 @@ class Agent_harnessing_quantize(Agent_harnessing):
         # print(self.x_D,self.x_E)
 
 
-class Encoder(object):
-    def __init__(self, n, m):
-        self.n = n
-        self.m = m
-        self.x_E = np.zeros([n, m])
-        self.v_E = np.zeros([n, m])
-
-        self.y = np.zeros([n, m])
-        self.z = np.zeros([n, m])
-
-    def x_encode(self, x_i, j, h_x):
-        tmp = (x_i - self.x_E[j]) / h_x
-        # print(tmp,x_i - self.x_E[j],h_x)
-        self.y[j] = self.quantize(tmp)
-        self.x_E[j] = h_x * self.y[j] + self.x_E[j]
-
-    def v_encode(self, v_i, j, h_v):
-        tmp = (v_i - self.v_E[j]) / h_v
-        self.z[j] = self.quantize(tmp)
-        self.v_E[j] = h_v * self.z[j] + self.v_E[j]
-
-    def send_y_z(self, j, name):
-        return (self.y[j], self.z[j]), name
-
-    def send_x_E_v_E(self):
-        # print(self.x_E, self.v_E)
-        return self.x_E, self.v_E
-
-    def send_x_v(self, name):
-        return self.x_E[name], self.v_E[name]
-
-    def quantize(self, x_i):
-        tmp = np.around(x_i)
-        # print(max(tmp))
-        return tmp
-
-
-class Decoder(object):
-    def __init__(self, n, m):
-        self.n = n
-        self.m = m
-        self.x_D = np.zeros([n, m])
-        self.v_D = np.zeros([n, m])
-
-        self.y = np.zeros([n, m])
-        self.z = np.zeros([n, m])
-
-    def get_y_z(self, state, j):
-        self.y[j] = state[0]
-        self.z[j] = state[1]
-
-    def x_decode(self, j, h_x):
-        self.x_D[j] = h_x * self.y[j] + self.x_D[j]
-
-    def v_decode(self, j, h_v):
-        self.v_D[j] = h_v * self.z[j] + self.v_D[j]
-
-    def send_x_v(self, name):
-        return self.x_D[name], self.v_D[name]
-
-    def send_x_D_v_D(self):
-        return self.x_D, self.v_D
+# class Encoder(object):
+#     def __init__(self, n, m):
+#         self.n = n
+#         self.m = m
+#         self.x_E = np.zeros([n, m])
+#         self.v_E = np.zeros([n, m])
+#
+#         self.y = np.zeros([n, m])
+#         self.z = np.zeros([n, m])
+#
+#     def x_encode(self, x_i, j, h_x):
+#         tmp = (x_i - self.x_E[j]) / h_x
+#         # print(tmp,x_i - self.x_E[j],h_x)
+#         self.y[j] = self.quantize(tmp)
+#         self.x_E[j] = h_x * self.y[j] + self.x_E[j]
+#
+#     def v_encode(self, v_i, j, h_v):
+#         tmp = (v_i - self.v_E[j]) / h_v
+#         self.z[j] = self.quantize(tmp)
+#         self.v_E[j] = h_v * self.z[j] + self.v_E[j]
+#
+#     def send_y_z(self, j, name):
+#         return (self.y[j], self.z[j]), name
+#
+#     def send_x_E_v_E(self):
+#         # print(self.x_E, self.v_E)
+#         return self.x_E, self.v_E
+#
+#     def send_x_v(self, name):
+#         return self.x_E[name], self.v_E[name]
+#
+#     def quantize(self, x_i):
+#         tmp = np.around(x_i)
+#         # print(max(tmp))
+#         return tmp
+#
+#
+# class Decoder(object):
+#     def __init__(self, n, m):
+#         self.n = n
+#         self.m = m
+#         self.x_D = np.zeros([n, m])
+#         self.v_D = np.zeros([n, m])
+#
+#         self.y = np.zeros([n, m])
+#         self.z = np.zeros([n, m])
+#
+#     def get_y_z(self, state, j):
+#         self.y[j] = state[0]
+#         self.z[j] = state[1]
+#
+#     def x_decode(self, j, h_x):
+#         self.x_D[j] = h_x * self.y[j] + self.x_D[j]
+#
+#     def v_decode(self, j, h_v):
+#         self.v_D[j] = h_v * self.z[j] + self.v_D[j]
+#
+#     def send_x_v(self, name):
+#         return self.x_D[name], self.v_D[name]
+#
+#     def send_x_D_v_D(self):
+#         return self.x_D, self.v_D
 
 class Encoder_diffusion(object):
     def __init__(self, n, m):
@@ -307,7 +308,7 @@ class Encoder_diffusion(object):
 
     def quantize(self, x_i):
         tmp = np.around(x_i)
-        # print(max(tmp))
+        print(max(tmp))
         return tmp
 
 

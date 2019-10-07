@@ -28,6 +28,8 @@ if __name__=='__main__':
     # n= 9
     for x,y, in pos:
         plt.scatter(x,y)
+    plt.xlim([0,25])
+    plt.ylim([0, 25])
     plt.show()
 
     x = 5
@@ -36,7 +38,7 @@ if __name__=='__main__':
     x_div = 25
     y_div = 25
     m = (x_div-1)*(y_div-1)
-    D = 2.8*(1e-3 )*5*2*2
+    D = 2.8*(1e-2 )
     delta_t = 0.04
 
     delta_start = 5
