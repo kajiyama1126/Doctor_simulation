@@ -30,6 +30,7 @@ if __name__=='__main__':
         plt.scatter(x,y)
     plt.xlim([0,25])
     plt.ylim([0, 25])
+    plt.grid(which='major',axis='both')
     plt.show()
 
     x = 5
@@ -151,6 +152,20 @@ if __name__=='__main__':
 
     # weight =[1/3,1/3,1/3]
     weight = [1/n for i in range(n)]
+    adj_weight = np.zeros([n,n])
+
+    for i in range(n):
+        for j in range(n):
+            if i == j+1 or i==j-1 or i==j+6 or i==j-6:
+                adj_weight[i][j] = 1
+
+    D = np.zeros([n,n])
+    for i in range(n):
+        for j in range(n):
+            if i==j:
+                D[i][j] = np.sum(weight[i])
+
+    weight = np.identity(n)-1/5(D-adj_weight)
     # weight = [1]
     for i in range(n):
         # agent = Agent_harnessing_diffusion(n,m,A[i],b[i],eta=eta ,weight = weight ,name=i,lam = lam)

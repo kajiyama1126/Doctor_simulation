@@ -117,12 +117,12 @@ class Agent_harnessing_diffusion_quantized(Agent_harnessing_diffusion):
         self.v_E = np.zeros([n,1, m])
         self.x_D = np.zeros([n,1, m])
         self.v_D = np.zeros([n,1, m])
-        self.h_x = 1
-        self.h_v = 1
+        self.h_x = 0.001
+        self.h_v = 0.001
 
     def make_h(self,k):
-        self.h_x = self.h_x*0.9
-        self.h_v = self.h_v*0.9
+        self.h_x = self.h_x*0.99
+        self.h_v = self.h_v*0.99
 
     def send(self, j):
         if self.weight[j] == 0:
@@ -148,7 +148,7 @@ class Agent_harnessing_diffusion_quantized(Agent_harnessing_diffusion):
         x[self.name] = np.zeros([1,self.m])
         v = self.v_D - self.v_E
         v[self.name] = np.zeros([1,self.m])
-        print(x,v)
+        # print(x,v)
 
         grad_bf = self.grad()
         # self.x_i = np.dot(self.weight,self.x.reshape([self.n,self.m])) - self.eta * self.v_i
@@ -308,7 +308,7 @@ class Encoder_diffusion(object):
 
     def quantize(self, x_i):
         tmp = np.around(x_i)
-        print(max(tmp))
+        # print(max(tmp))
         return tmp
 
 
