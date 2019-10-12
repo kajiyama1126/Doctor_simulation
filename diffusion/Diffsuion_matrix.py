@@ -124,8 +124,8 @@ class Diffusion(object):
     def distribution_function(self,x,y):
         # tmp = math.exp(-0.1*((x-15)**2 + (y-10)**2))
         # tmp1 = 0.5* math.exp(-0.2*((x-5)**2+(y-15)**2))
-        initial = 0.6*math.exp(-3.0*((x-3.4)**2 + (y-1.6)**2))
-        initial2 = 0.8*math.exp(-2.0*((x-1.6)**2+(y-2.8)**2))
+        initial = 10*math.exp(-0.25*((x-10)**2 + (y-5)**2))
+        initial2 = 15*math.exp(-0.25*((x-5)**2+(y-10)**2))
         return initial+initial2
 
     def make_initial_distribution2(self):
@@ -162,10 +162,15 @@ class Diffusion(object):
         plt.show()
 
     def draw2(self):
-        x = np.arange(0, self.h_x, self.del_x)
-        y= np.arange(0, self.h_y, self.del_y)
+        x = np.arange(0, self.h_x+1, self.del_x)
+        y= np.arange(0, self.h_y+1, self.del_y)
         X,Y = plt.meshgrid(x,y)
         Z = self.u.reshape([self.x_div,self.y_div])
+
+        plt.xlabel("x")
+        plt.ylabel("y")
+        # plt.xlim([0, self.h_x])
+        # plt.ylim([0, self.h_y])
 
         plt.pcolor(X,Y,Z.T)
         plt.colorbar()

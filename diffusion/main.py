@@ -10,6 +10,7 @@ import random
 from agent.agent import Agent_harnessing
 
 random.seed(0)
+np.random.seed(0)
 
 X_RANGE = 18
 Y_RANGE = 18
@@ -33,26 +34,28 @@ if __name__=='__main__':
     for x,y, in pos:
         plt.scatter(x,y)
     plt.xlim([0,X_RANGE ])
+    plt.xlabel("x")
+    plt.ylabel("y")
     plt.ylim([0, Y_RANGE ])
     plt.grid(which='major',axis='both')
     plt.show()
 
-    x = 5
-    y = 5
+    x = 18
+    y = 18
 
     x_div = X_RANGE
     y_div = Y_RANGE
     m = (x_div-1)*(y_div-1)
-    D = 2.8*(1e-2 )
+    D = 10*(1e-2 )*10
     delta_t = 0.04
 
-    delta_start = 5
-    delta_end = 250
+    delta_start = 10
+    delta_end = 200
     # iteration = 1000
     iteration = delta_end-delta_start
-    update_iteration = 40000 # エージェントの計算回数
-    eta = 0.0010
-    lam = 0.025
+    update_iteration = 100000 # エージェントの計算回数
+    eta = 0.15
+    lam = 0.000001
     # lam = 0
 
     # pos = [[5,5],[4,6],[6,4]]
@@ -204,9 +207,9 @@ if __name__=='__main__':
 
         cost_value = 0
         for i in range(n):
-            cost_value += 1/2* np.linalg.norm(np.dot(A[i],(Agent[0].x_i.reshape([-1,1])))-b[i]) ** 2
+            cost_value += 1/2* np.linalg.norm(np.dot(A[i],(Agent[0].x_i.reshape([-1,1])))-b[i]) ** 2 + 1/2*lam * np.linalg.norm(Agent[0].x_i)**2
 
-        cost_value += 1/2*lam * np.linalg.norm(Agent[0].x_i)**2
+        # cost_value += 1/2*lam * np.linalg.norm(Agent[0].x_i)**2
         cost_value +=  -optimal_value
 
         print(cost_value)

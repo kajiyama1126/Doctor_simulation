@@ -121,8 +121,8 @@ class Agent_harnessing_diffusion_quantized(Agent_harnessing_diffusion):
         self.h_v = 0.1
 
     def make_h(self,k):
-        self.h_x = self.h_x*0.99
-        self.h_v = self.h_v*0.99
+        self.h_x = self.h_x*0.995
+        self.h_v = self.h_v*0.995
 
     def send(self, j):
         if self.weight[j] == 0:
