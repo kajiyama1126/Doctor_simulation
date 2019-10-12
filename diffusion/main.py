@@ -53,7 +53,7 @@ if __name__=='__main__':
     delta_end = 200
     # iteration = 1000
     iteration = delta_end-delta_start
-    update_iteration = 100000 # エージェントの計算回数
+    update_iteration = 200000 # エージェントの計算回数
     eta = 0.15
     lam = 0.000001
     # lam = 0
