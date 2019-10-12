@@ -117,8 +117,8 @@ class Agent_harnessing_diffusion_quantized(Agent_harnessing_diffusion):
         self.v_E = np.zeros([n,1, m])
         self.x_D = np.zeros([n,1, m])
         self.v_D = np.zeros([n,1, m])
-        self.h_x = 0.001
-        self.h_v = 0.001
+        self.h_x = 0.1
+        self.h_v = 0.1
 
     def make_h(self,k):
         self.h_x = self.h_x*0.99

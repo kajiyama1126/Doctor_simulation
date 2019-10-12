@@ -45,11 +45,11 @@ class Problem_L2(Problem):
         n, m = self.n, self.m
         b_matrix = b_matrix.reshape(self.b_m)
         self.x = cvx.Variable(m)
-        obj = cvx.Minimize(0)
+        # obj = cvx.Minimize(0)
         # obj += cvx.Minimize(0)
-        for i in range(n):
+        # for i in range(n):
             # tmp = self.A[i]*self.x
-            obj = cvx.Minimize(cvx.sum_squares(A_matrix * self.x - b_matrix))+self.lam*cvx.Minimize(cvx.sum_squares(self.x))
+        obj = 1/2*cvx.Minimize(cvx.sum_squares(A_matrix * self.x - b_matrix))+1/2*self.lam*cvx.Minimize(cvx.sum_squares(self.x))
             # obj = cvx.Minimize(cvx.sum_squares(A_matrix * self.x ))
             # obj += cvx.Minimize(cvx.sum_squares(tmp - self.b[i]))
             # obj+=cvx.Minimize(1 / 2 * cvx.power(cvx.norm((self.A[i]*self.x - self.b[i]), 2), 2))
@@ -57,7 +57,8 @@ class Problem_L2(Problem):
         #                  + 1 / 2 * n * self.lam * cvx.power(cvx.norm((self.x), 2), 2))
         # cvx.Minimize()
         self.prob = cvx.Problem(obj)
-        self.prob.solve(solver=cvx.ECOS,verbose=True,abstol=1e-15,feastol=1e-15)
+        self.prob.solve(solver=cvx.SCS,verbose=True,eps=1e-10)
+        # ,verbose=True,abstol=1e-15,feastol=1e-15)
         print(self.prob.status, self.x.value)
 
 

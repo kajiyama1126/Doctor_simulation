@@ -10,11 +10,15 @@ import random
 from agent.agent import Agent_harnessing
 
 random.seed(0)
+
+X_RANGE = 18
+Y_RANGE = 18
+
 if __name__=='__main__':
     pos = []
-    for i in range(6):
-        for j in range(6):
-            pos_i = [4*i+2,4*j+2]
+    for i in range(4):
+        for j in range(4):
+            pos_i = [4*i+3,4*j+3]
             pos.append(pos_i)
 
     # for i in range(100):
@@ -28,16 +32,16 @@ if __name__=='__main__':
     # n= 9
     for x,y, in pos:
         plt.scatter(x,y)
-    plt.xlim([0,25])
-    plt.ylim([0, 25])
+    plt.xlim([0,X_RANGE ])
+    plt.ylim([0, Y_RANGE ])
     plt.grid(which='major',axis='both')
     plt.show()
 
     x = 5
     y = 5
 
-    x_div = 25
-    y_div = 25
+    x_div = X_RANGE
+    y_div = Y_RANGE
     m = (x_div-1)*(y_div-1)
     D = 2.8*(1e-2 )
     delta_t = 0.04
@@ -46,9 +50,11 @@ if __name__=='__main__':
     delta_end = 250
     # iteration = 1000
     iteration = delta_end-delta_start
-    update_iteration = 50000 # エージェントの計算回数
-    eta = 0.0025
-    lam = 0.01
+    update_iteration = 40000 # エージェントの計算回数
+    eta = 0.0010
+    lam = 0.025
+    # lam = 0
+
     # pos = [[5,5],[4,6],[6,4]]
     # pos = [[5,5],[4,6],[6,4],[2,8],[8,2],[2,2],[8,8],[6,6],[4,4],[10,10],[13,13],[15,15],[18,12],[12,18]]
     # pos = [[5,5],[4,6],[6,4],[2,7],[7,2],[2,2],[7,7],[6,6],[4,4]]
@@ -73,6 +79,7 @@ if __name__=='__main__':
     Map.make_initial_distribution2()
     # Map.draw3D()
     Map.draw2()
+    # Map.draw3D2()
 
     # m = (x_div-1)*(y_div-1)
     # Omega = np.zeros(m,m)
@@ -85,6 +92,7 @@ if __name__=='__main__':
 
     Map.update_2(iteration=delta_start)
     Map.draw2()
+    # Map.draw3D2()
     for i in range(n):
         x_pos = pos[i][0]
         y_pos = pos[i][1]
@@ -102,6 +110,7 @@ if __name__=='__main__':
             phi[i] = np.concatenate([phi[i],phi_i2])
     Map.draw2()
     # Map.draw3D()
+    # Map.draw3D2()
 
 
 
@@ -145,7 +154,15 @@ if __name__=='__main__':
     plt.pcolor(X, Y, Z.T)
     plt.colorbar()
     plt.show()
+    #
+    # fig = plt.figure()
+    # ax = Axes3D(fig)
+    # ax.set_xlabel('x')
+    # ax.set_ylabel('y')
+    #
+    # ax.plot_wireframe(X, Y, Z)
 
+    # plt.show()
 
     from agent.agent import Agent_harnessing_diffusion,Agent_harnessing_diffusion_quantized
     Agent = []
@@ -153,7 +170,7 @@ if __name__=='__main__':
     # weight =[1/3,1/3,1/3]
     weight = [1/n for i in range(n)]
     adj_weight = np.zeros([n,n])
-
+    #
     for i in range(n):
         for j in range(n):
             if i == j+1 or i==j-1 or i==j+6 or i==j-6:
@@ -165,11 +182,11 @@ if __name__=='__main__':
             if i==j:
                 D[i][j] = np.sum(weight[i])
 
-    weight = np.identity(n)-1/5(D-adj_weight)
+    weight = np.identity(n)-1/5*(D-adj_weight)
     # weight = [1]
     for i in range(n):
         # agent = Agent_harnessing_diffusion(n,m,A[i],b[i],eta=eta ,weight = weight ,name=i,lam = lam)
-        agent = Agent_harnessing_diffusion_quantized(n,m,A[i],b[i],eta=eta ,weight = weight ,name=i,lam = lam)
+        agent = Agent_harnessing_diffusion_quantized(n,m,A[i],b[i],eta=eta ,weight = weight[i] ,name=i,lam = lam)
         Agent.append(agent)
 
 
@@ -187,7 +204,9 @@ if __name__=='__main__':
 
         cost_value = 0
         for i in range(n):
-            cost_value += 1/2* np.linalg.norm(np.dot(A[i],(Agent[0].x_i.reshape([-1,1])))-b[i]) ** 2 + 1/2*lam * np.linalg.norm(Agent[0].x_i)**2
+            cost_value += 1/2* np.linalg.norm(np.dot(A[i],(Agent[0].x_i.reshape([-1,1])))-b[i]) ** 2
+
+        cost_value += 1/2*lam * np.linalg.norm(Agent[0].x_i)**2
         cost_value +=  -optimal_value
 
         print(cost_value)
@@ -208,6 +227,16 @@ if __name__=='__main__':
     plt.pcolor(X, Y, Z.T)
     plt.colorbar()
     plt.show()
+
+    # fig = plt.figure()
+    # ax = Axes3D(fig)
+    # ax.set_xlabel('x')
+    # ax.set_ylabel('y')
+    #
+    # ax.plot_wireframe(X, Y, Z)
+
+    plt.show()
+
 
     x_axis = np.linspace(0,update_iteration-1,update_iteration)
     plt.plot(x_axis,cost_value_estimate)

@@ -172,6 +172,21 @@ class Diffusion(object):
         plt.show()
 
 
+    def draw3D2(self):
+        x = np.arange(0, self.h_x, self.del_x)
+        y= np.arange(0, self.h_y, self.del_y)
+        X,Y = plt.meshgrid(x,y)
+        Z = self.u.reshape([self.x_div,self.y_div])
+
+        fig = plt.figure()
+        ax = Axes3D(fig)
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+
+        ax.plot_wireframe(X,Y,Z)
+
+        plt.show()
+
     # def update(self):
 
         # h_x = int(self.x_size/self.x_div)
