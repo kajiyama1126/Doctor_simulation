@@ -132,7 +132,7 @@ class Agent_harnessing(object):
             gtmp = gtmp + self.bsgn(1-self.b_i[p]*np.dot(self.x_i, self.A_i[p])) * (-self.b_i[p] * self.A_i[p])
 
         tilde_x = self.x_i
-        tilde_x[2] = 0
+        # tilde_x[2] = 0
 
         g = self.C_i * gtmp / size + tilde_x / self.n
 
@@ -178,6 +178,43 @@ class Agent_harnessing(object):
     def trigger_x_ij_v_ij(self):
         return self.trigger_x_ij, self.trigger_v_ij
 
+
+##=======================================================================================================##
+class Agent_harnessing_logistic(Agent_harnessing):
+
+    def __init__(self, n, m, A, b, eta, weight, name, bKi, tKi, C_i):
+        self.n = n
+        self.m = m
+        self.A_i = A
+        self.b_i = b
+        self.name = name
+        self.weight = weight
+        self.eta = eta
+        self.bKi = bKi
+        self.tKi = tKi
+        self.C_i = C_i
+
+        self.initial_state()
+        self.trigger_x_ij = [[] for i in range(self.n)]
+        self.trigger_v_ij = [[] for i in range(self.n)]
+
+    def grad(self):
+        size = len(self.b_i)
+        gtmp = np.zeros(self.m)
+        M = size
+
+        for p in range(size):
+            # gtmp = gtmp + self.bsgn(1-self.b_i[p]*np.dot(self.x_i, self.A_i[p])) * (-self.b_i[p] * self.A_i[p])
+            gtmp1 = (self.b_i[p] * self.bKi[self.name * M: (self.name+1) * M][p].T)
+            # gtmp2 = np.exp(self.b_i[p] * np.dot(self.x_i,self.bKi[self.name * M: (self.name+1) * M][p]))/(1+np.exp(self.b_i[p] * np.dot(self.x_i,self.bKi[self.name * M: (self.name+1) * M][p])))
+            gtmp2 = 1 / (1 + np.exp(-self.b_i[p] * np.dot(self.x_i, self.bKi[self.name * M: (self.name + 1) * M][p])))
+            gtmp += gtmp1 * gtmp2
+        tilde_x = self.x_i
+        # tilde_x[2] = 0
+
+        g = self.C_i * gtmp / size + tilde_x / self.n
+
+        return g
 
 ##=======================================================================================================##
 class Agent_harnessing_EventTriggered_trigger(object):

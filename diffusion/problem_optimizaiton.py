@@ -57,7 +57,7 @@ class Problem_L2(Problem):
         #                  + 1 / 2 * n * self.lam * cvx.power(cvx.norm((self.x), 2), 2))
         # cvx.Minimize()
         self.prob = cvx.Problem(obj)
-        self.prob.solve(solver=cvx.SCS,verbose=True,max_iters=20000,eps=1e-12)
+        self.prob.solve(solver=cvx.SCS,verbose=True,max_iters=5000,eps=1e-12)
         # ,verbose=True,abstol=1e-15,feastol=1e-15)
         print(self.prob.status, self.x.value)
 
