@@ -46,16 +46,16 @@ if __name__=='__main__':
     x_div = X_RANGE
     y_div = Y_RANGE
     m = (x_div-1)*(y_div-1)
-    D = 10*(1e-2 )*10
+    D = 20*(1e-2 )*10
     delta_t = 0.04
 
     delta_start = 10
-    delta_end = 200
+    delta_end = 100
     # iteration = 1000
     iteration = delta_end-delta_start
     update_iteration = 200000 # エージェントの計算回数
-    eta = 0.15
-    lam = 0.000001
+    eta = 0.18
+    lam = 0.0000001
     # lam = 0
 
     # pos = [[5,5],[4,6],[6,4]]

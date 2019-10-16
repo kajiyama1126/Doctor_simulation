@@ -124,8 +124,8 @@ class Diffusion(object):
     def distribution_function(self,x,y):
         # tmp = math.exp(-0.1*((x-15)**2 + (y-10)**2))
         # tmp1 = 0.5* math.exp(-0.2*((x-5)**2+(y-15)**2))
-        initial = 10*math.exp(-0.25*((x-10)**2 + (y-5)**2))
-        initial2 = 15*math.exp(-0.25*((x-5)**2+(y-10)**2))
+        initial = 10*math.exp(-0.5*((x-12)**2 + (y-5)**2))
+        initial2 = 15*math.exp(-0.5*((x-5)**2+(y-12)**2))
         return initial+initial2
 
     def make_initial_distribution2(self):
