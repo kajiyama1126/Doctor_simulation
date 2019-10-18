@@ -16,10 +16,13 @@ class GuassianKernelSVC(BaseEstimator):
         h_hat = np.zeros(nd)
 
         for i in range(nd):
-            h = 0
+            # h = 0
+        #     for p in range(M):
+        #         gk[p] = np.exp(-gamma * (np.linalg.norm(X[i] - u[p])) ** 2)
+        #     h = h + np.dot(est[name * M: (name + 1) * M], gk) + est[-1]
             for p in range(M):
                 gk[p] = np.exp(-gamma * (np.linalg.norm(X[i] - u[p])) ** 2)
-            h = h + np.dot(est[name * M: (name + 1) * M], gk) + est[-1]
+            h = np.dot(est.T, gk)
 
             h_hat[i] = self.sgnf(h)
         #print(est)

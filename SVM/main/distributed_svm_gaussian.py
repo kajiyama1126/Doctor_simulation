@@ -54,13 +54,13 @@ Ccvx = 10
 C = Ccvx * np.ones(n)
 
 # parameter of the Gaussian kernel
-gam = 20
+gam = 200
 
 # Randomization seed
 np.random.seed(1)
 
 # Number of iterations
-iteration = 500000
+iteration = 50000
 
 # Interval for figure plot
 fig_interval = 5000
@@ -115,8 +115,8 @@ y0 = [-1 if i == 0 else i for i in y0]
 #(X1, y1) = (X0, y0)
 X1, y1 = shuffle(X0, y0)  # random select
 
-X2 = np.hstack((X1, np.ones([len(X1), 1])))
-
+# X2 = np.hstack((X1, np.ones([len(X1), 1])))
+X2=X1
 agent_x = [X2[M * i:M * (i + 1)] for i in range(n)]
 agent_y = [y1[M * i:M * (i + 1)] for i in range(n)]
 
@@ -128,36 +128,49 @@ agent_y = [y1[M * i:M * (i + 1)] for i in range(n)]
 # plot_decision_regions(X1, y1, svm, 'opt', None, resolution, x1_min, x1_max, x2_min, x2_max)
 
 # Centralized SVM (CVXPY)
-xc = cvx.Variable(m)
+xc = cvx.Variable(M)
 fopt = 0
+ftmp_i = [0 for i in range(n)]
 ftmp = 0
-x_opt = np.zeros(m)
+x_opt = np.zeros(M)
 
-Kc = np.zeros((m, m))
+# Kc = np.zeros((m, m))
+Kc = np.zeros((n,M,M))
+# for i in range(n):
+#     for p in range(m-1):
+#         for q in range(m-1):
+#             Kc[n][p][q] = np.exp(-gam * np.linalg.norm(X2[p] - X2[q]) ** 2)
 for i in range(n):
-    for p in range(m-1):
-        for q in range(m-1):
-            Kc[p][q] = np.exp(-gam * np.linalg.norm(X2[p] - X2[q]) ** 2)
-
-for p in range(m-1):
+    for p in range(M):
+        for q in range(M):
+            Kc[i][p][q] = np.exp(-gam * np.linalg.norm(X2[p] - X2[q]) ** 2)
+for i in range(n):
+    for p in range(M):
     # print(np.size(y1[p]))
     # print(np.size(Kc[p]))
-    ftmp = ftmp + cvx.pos(1 - y1[p] * xc.T*Kc[p])
-fopt = Ccvx * ftmp / M + cvx.quad_form(xc, Kc)
+        ftmp_i[i] += Ccvx / M* cvx.pos(1 - agent_y[i][p] * Kc[i][p]*xc)
+    ftmp_i[i]+= 1/2*cvx.quad_form(xc, Kc[i])
+
+    fopt += ftmp_i[i]
+
+# fopt = Ccvx * ftmp / M + cvx.quad_form(xc, Kc)
 #fopt = C * sum(cvx.pos(1 - y1 * xc.T * X2)) / csize + cvx.sum_squares(xc[0:2]) / 2
 
 obj = cvx.Minimize(fopt)
 #constrains = [cvx.norm(xc, 2) <= R]
 prob = cvx.Problem(obj)
-prob.solve(solver=cvx.ECOS, verbose=True, abstol=1e-20, reltol=1e-20, feastol=1e-20, max_iters=25000)
-x_opt_tmp = xc.value
-for i in range(m):
-    x_opt[i] = x_opt_tmp[i]
+# prob.solve(solver=cvx.ECOS, verbose=True, abstol=1e-20, reltol=1e-20, feastol=1e-20, max_iters=25000)
+prob.solve(solver=cvx.SCS,verbose=True,max_iters=2000,eps=1e-12)
+x_opt = xc.value
+# for i in range(m):
+#     x_opt[i] = xc.value
 fopt = prob.value
+# print(x_opt)
 print('xopt_cvx: ', x_opt)
 print('fopt_cvx: ', fopt)
 
-plot_decision_regions2(X0, y0, GuassianKernelSVC(), -2, x_opt, X1, gam, 0, m-1, resolution, x1_min, x1_max, x2_min, x2_max)
+for i in range(n):
+    plot_decision_regions2(X0, y0, GuassianKernelSVC(), -2, x_opt, agent_x[i], gam, 0, M, resolution, x1_min, x1_max, x2_min, x2_max)
 plt.show()
 # ---------------------------------------------------------------------------#
 # Communication Graph
