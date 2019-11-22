@@ -20,6 +20,7 @@ def f(n,m,x,minimum):
             sum += fun[i][j]
             
     return sum
+Optimal_value = 16
 minimum_point = [[-3,3],[-2,1],[-2,2],[0,4],[-3,5]]
 n = 5
 m = 2
@@ -97,7 +98,7 @@ for k1 in range(0,1000):
         #print sum3/n
         for i in range(n):
             save_data.save_estimate(all_agent[i].estimate_hat,i)
-        f_time.append(sum3/n)
+        f_time.append(sum3/n-Optimal_value)
     #print sendcount
     #print k1+1
 
@@ -172,7 +173,7 @@ for k1 in range(0,1000):
         #print sum3/n
         for i in range(n):
             save_data.save_estimate(all_agent[i].estimate_hat,i)
-        f_senkou.append(sum3/n)
+        f_senkou.append(sum3/n-Optimal_value)
     #print sendcount
     #print k1+1
 
@@ -248,18 +249,20 @@ for k1 in range(0,1000):
         #print sum3/n
         for i in range(n):
             save_data.save_estimate(all_agent[i].estimate_hat,i)
-        f_event.append(sum3/n)
+        f_event.append(sum3/n-Optimal_value)
 
 
 x=np.arange(2,1001,1)
 print (len(f_time))
-plt.plot(x,f_time,label='Time-Triggered Algorithm [17]',lw='2')
-plt.plot(x,f_senkou,'-.',label='Event-Triggered Algorithm [19]',lw='2')
+plt.plot(x,f_time,label='Time-Triggered Algorithm [17]?_',lw='2')
+plt.plot(x,f_senkou,'-.',label='Event-Triggered Algorithm [19]?',lw='2')
 plt.plot(x,f_event,'--',label = 'Proposed Algorithm',lw='2')
 plt.legend()
 plt.xlabel('iteration')
 plt.ylabel('average cost')
 plt.show()
+
+save_data.make_trigger_graph()
 
 # plt.plot(x,f_time,label='Time Trigger Algorithm')
 # plt.plot(x,f_senkou,'-.',label='Previous Event Trigger Algortihm')

@@ -1,8 +1,8 @@
 import numpy as np
 
 from moment_subgrad.jikken2.paper_CDC_class import new_iteration_L1_paper3, new_iteration_L1_paper,new_Agent_moment_CDC2017_paper2,new_iteration_L1_paper2,new_iteration_L1_paper_powerpoint
-from jikken2.iteration import new_iteration_L2_harnessing,new_iteration_L2,new_iteration_L1,new_iteration_Dist
-from jikken2.iteration import sub_new_iteration_L1
+from moment_subgrad.jikken2.iteration import new_iteration_L2_harnessing,new_iteration_L2,new_iteration_L1,new_iteration_Dist
+from moment_subgrad.jikken2.iteration import sub_new_iteration_L1
 if __name__ == '__main__':
     #n = 50
     #m = 20
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     #pattern = 2
     pattern = 8
     #test = 4000
-    test = 40000
+    test = 50000
     #step = [0.2, 0.2, 0.5, 0.5, 1.0, 1.0, 2.0, 2.0] #<-- IEICE paper
 
     # #実験2　gamma 比較用

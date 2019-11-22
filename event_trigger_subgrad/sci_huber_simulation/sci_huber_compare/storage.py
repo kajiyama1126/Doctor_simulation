@@ -37,7 +37,7 @@ class Make_graph:
         for i in range(self.n):
             plt.plot(self.count_trigger[i],'o',c = self.color[i], label=self.agent_name[i])
         plt.ylim([0,(self.n + 1)*10])
-        plt.xlim([0,300])
+        plt.xlim([0,1000])
         #plt.legend() 
         plt.xlabel("iteration")
         plt.yticks([(50-10*i) for i in range(self.n)],self.agent_name)
