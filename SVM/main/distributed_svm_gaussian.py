@@ -171,6 +171,7 @@ print('fopt_cvx: ', fopt)
 
 for i in range(n):
     plot_decision_regions2(X0, y0, GuassianKernelSVC(), -2, x_opt, agent_x[i], gam, 0, M, resolution, x1_min, x1_max, x2_min, x2_max)
+    plot_decision_regions2(X0, y0, KernelSVC(), -2, x_opt, agent_x[i], gam, 0, M, resolution, x1_min, x1_max, x2_min, x2_max)
 plt.show()
 # ---------------------------------------------------------------------------#
 # Communication Graph

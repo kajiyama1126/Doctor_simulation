@@ -24,17 +24,22 @@ print(__doc__)
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import math
+from Logistic.Solver import Solver,Solver_logistic
 from sklearn import datasets
 import numpy as np
-from Regression.Logistic.logistic_agent import Agent_harnessing_logistic
-from Regression.sq_mean.make_communication import Communication,Circle_communication
+from Logistic.logistic_agent import Agent_harnessing_logistic
+from Logistic.make_communication import Communication,Circle_communication
 
-n = 10
+# n = 10
+n = 20
 m = 3
 size = int(100/n)
-eta = 0.10
-iteration = 550
+eta = 0.1
+lam = 0.001
+iteration = 100
 save_iteration = 1
+np.random.seed(0)
 
 iris = datasets.load_iris()
 X1 = iris.data[:100, :(m - 1)]  # we only take the first two features.
@@ -45,18 +50,26 @@ y = iris.target[:100]
 agent_x = [X1[size * i:size * (i + 1)] for i in range(n)]
 agent_y = [y[size * i:size * (i + 1)] for i in range(n)]
 
-# Graph = Communication(n, 4, 0.3)
-Graph = Circle_communication(n,0.25)
-# Graph.make_connected_WS_graph()
-Graph.make_circle_graph()
-Weight_matrix = Graph.send_P()
+#集中型最適解導出
+Problem = Solver_logistic(n * size , m, X1,y,lam)
+Problem.solve()
+f_opt,x_opt = Problem.send_opt()
 
+# Graph = Communication(n, 4, 0.3)
+# Graph = Circle_communication(n,0.25)
+Graph = Communication(n,4,0.25)
+Graph.make_connected_WS_graph()
+# Graph.make_connected_WS_graph()
+# Graph.make_circle_graph()
+Weight_matrix = Graph.send_P()
+# Weight_matrix=[1]
 fig = plt.figure()
 # ims= [[] for i in range(n)]
+f_hist = []
 ims = []
 Agents = []
 for i in range(n):
-    Agents.append(Agent_harnessing_logistic(n, m, agent_x[i], agent_y[i], eta, i, Weight_matrix[i]))
+    Agents.append(Agent_harnessing_logistic(n, m, agent_x[i], agent_y[i], eta, Weight_matrix[i],i,lam/n))
 
 for k in range(iteration):
     for i in range(n):
@@ -77,8 +90,21 @@ for k in range(iteration):
             im += plt.plot(x0[i], x1[i])
         ims.append(im)
     print(k)
+
+    x_i = Agents[0].x_i
+    f = 0
+    for i in range(n*size):
+        f +=  math.log(1+ math.exp(np.dot(X1[i],x_i))) - y[i]*np.dot(X1[i],x_i)
+    f+= 1 / 2 * lam* np.linalg.norm(x_i) ** 2
+    print(f-f_opt)
+    f_hist.append(f-f_opt)
+
 for i in range(n):
     print(Agents[i].x_i)
+#
+# plt.plot(f_hist)
+# plt.yscale('log')
+# plt.show()
 
 
 ax = plt.subplot(1,1,1)
@@ -92,8 +118,8 @@ legend = ax.legend(handles=[p1,p2],labels=['Setosa','Versicolour'],loc='upper le
 # ani = animation.ArtistAnimation(fig,None)
 # for i in range(n):
 ani = animation.ArtistAnimation(fig,ims,interval=30)
-plt.xlim([0,10])
-plt.ylim([0,10])
+plt.xlim([0,8])
+plt.ylim([0,6])
 
 plt.title('Logistic regression in a part of Iris data set')
 plt.xlabel('Sepal length')
@@ -101,6 +127,8 @@ plt.ylabel('Sepal width')
 # plt.legend()
 
 # fig.legend()
-ani.save(filename='hoge3.gif', writer="imagemagick")
-print('save完了')
+# ani.save(filename='hoge3.gif', writer="imagemagick")
+# ani.save(filename='hoge3.html', writer="imagemagick")
+# ani.save(filename='hoge3.gif', writer="pillow")
+# print('save完了')
 plt.show()

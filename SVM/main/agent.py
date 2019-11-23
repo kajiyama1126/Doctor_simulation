@@ -1,5 +1,99 @@
 import numpy as np
 #from autograd import grad
+class Agent_subgrad_hinge(object):
+    #def __init__(self, n, m, A, b, eta, weight, name, C_i):
+    def __init__(self, n, m, A, b, eta, weight, name,lam):
+        self.n = n
+        self.m = m
+        self.A_i = A
+        self.b_i = b
+        self.name = name
+        self.weight = weight
+        self.eta = eta
+        self.lam = lam
+        # self.bKi = bKi
+        # self.tKi = tKi
+        # self.C_i = C_i
+
+        self.initial_state()
+
+        self.trigger_x_ij = [[] for i in range(self.n)]
+        self.trigger_v_ij = [[] for i in range(self.n)]
+
+    def initial_state(self):
+        #self.x_i = 2 * np.random.rand(self.m) - 1
+        self.x_i = np.random.rand(self.m)
+        #self.x_i = np.random.rand(self.m)
+        # self.x_i = 1 * np.ones(self.m)
+        self.x = np.zeros([self.n, self.m])
+        #self.x = np.ones([self.n, self.m])
+        #self.x = np.rand([self.n, self.m])
+        self.v_i = self.grad()
+        self.v = np.zeros([self.n, self.m])
+        self.trigger_count = 0
+        self.neighbor_agents = np.sum(np.sign(self.weight)) - 1
+
+    def bsgn(self, x):
+        sy = 0
+        if x >= 0:
+            sy = 1
+        return sy
+
+    def grad(self):
+        M = len(self.b_i)
+        gtmp = np.zeros(self.m)
+        #gtmp = 0
+        #print((self.bKi[self.name * M: (self.name+1) * M]).shape)
+        for p in range(M):
+        #     gtmp = gtmp + self.bsgn(1-self.b_i[p]*np.dot(self.bKi[self.name * M: (self.name+1) * M][p], self.x_i)) * (-self.b_i[p] * self.bKi[self.name * M: (self.name+1) * M][p].T)
+            if self.bsgn(1-self.b_i[p]*np.dot(self.A_i[p],self.x_i))>0:
+                gtmp = gtmp - self.b_i[p]*self.A_i[p]
+            else:
+                gtmp = np.zeros(self.m)
+
+        g = gtmp + self.lam * self.x_i
+        # g = self.C_i * gtmp / M + np.dot(self.tKi, self.x_i)
+
+        return g
+
+
+    def send(self, j):
+        self.trigger_count += 1
+
+        if self.weight[j] != 0:
+            self.trigger_x_ij[j].append(j + 1)
+            self.trigger_v_ij[j].append(None)
+            self.trigger_count += 1
+
+        else:
+            self.trigger_x_ij[j].append(None)
+            self.trigger_v_ij[j].append(None)
+
+        return (self.x_i, self.v_i), self.name
+
+    def receive(self, x_j, name):
+        self.x[name] = x_j[0]
+        self.v[name] = None
+
+    def update(self, k):
+        self.x[self.name] = self.x_i
+        self.v[self.name] = None
+        #grad_bf = self.grad()
+        self.x_i = np.dot(self.weight, self.x) - self.step_size(k, self.eta) * self.grad()
+        self.v_i = None
+
+    def step_size(self, k, eta):
+        #return eta / np.sqrt(k+900000000)
+        #return eta / np.sqrt(k + 1)
+        return eta / np.sqrt(k + 1000000)
+        #return eta
+
+    def trigger_x_ij_v_ij(self):
+        return self.trigger_x_ij, None
+
+
+##=======================================================================================================##
+
 
 class Agent_subgrad(object):
     #def __init__(self, n, m, A, b, eta, weight, name, C_i):
