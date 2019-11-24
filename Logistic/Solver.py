@@ -57,3 +57,22 @@ class Solver_hinge(Solver):
         self.prob = cvx.Problem(obj)
         self.prob.solve(verbose=True, abstol=1.0e-10, feastol=1.0e-10)
         print(self.prob.status, self.x.value)
+
+class Solver_hinge_proj(Solver_hinge):
+    def __init__(self, n, m, A, b,lam,epsiron,proj):
+        self.proj = proj
+        super(Solver_hinge_proj, self).__init__(n,m,A,b,lam,epsiron)
+
+
+    def solve(self):
+        n, m = self.n, self.m
+        self.x = cvx.Variable(m)
+        obj = cvx.Minimize(0)
+        for i in range(n):
+            obj += cvx.Minimize(cvx.pos(cvx.abs(self.b[i]-self.A[i] * self.x) -self.epsiron))
+        obj += cvx.Minimize(1/2*self.lam * cvx.norm(self.x)**2)
+        constraint = [cvx.norm(self.x) <= self.proj]
+        self.prob = cvx.Problem(obj,constraint)
+        # self.prob.solve(verbose=True, abstol=1.0e-10, feastol=1.0e-10)
+        self.prob.solve(verbose=True, abstol=1.0e-14, feastol=1.0e-14)
+        print(self.prob.status, self.x.value)

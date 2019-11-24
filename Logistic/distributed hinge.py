@@ -26,7 +26,7 @@ print(__doc__)
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import math
-from Logistic.Solver import Solver,Solver_logistic,Solver_hinge
+from Logistic.Solver import Solver,Solver_logistic,Solver_hinge,Solver_hinge_proj
 from sklearn import datasets
 import numpy as np
 from Logistic.logistic_agent import Agent_harnessing_logistic,Agent_hinge_event,Agent_hinge_event_fix,Agent_hinge_event_proj
@@ -38,11 +38,12 @@ m = 3
 size = int(100/n)
 # eta = 0.1
 eta = 1.0
-lam = 0.1
+# lam = 0.1
+lam = 0
 epsiron = 0.01
-proj = 10
-iteration = 100000
-save_iteration = 1000
+proj = 1
+iteration = 200000
+save_iteration = 10000
 
 np.random.seed(0)
 
@@ -57,9 +58,42 @@ agent_x = [X1[size * i:size * (i + 1)] for i in range(n)]
 agent_y = [y[size * i:size * (i + 1)] for i in range(n)]
 
 #集中型最適解導出
-Problem = Solver_hinge(n * size , m, X1,y,lam,epsiron)
+Problem = Solver_hinge_proj(n * size , m, X1,y,lam,epsiron,proj)
 Problem.solve()
 f_opt,x_opt = Problem.send_opt()
+
+x0 = np.linspace(0, 10)
+# x_ax = [[i for j in range(n)] for i in range(10)]
+x1 = []
+im = plt.plot()
+x1 = (x_opt[0] * x0 + x_opt[2]) / (-x_opt[1])
+im = plt.plot(x0, x1,linestyle = '--',label='optimal')
+
+ax = plt.subplot(1,1,1)
+p1 = plt.scatter(X1[:50,0],X1[:50,1],color='r',label='Setosa')
+p2 = plt.scatter(X1[50:100,0],X1[50:100,1] ,color='b',label='Versicolour')
+# plt.plot(x0,x1)
+# plt.legend)
+legend = ax.legend(loc='upper right')
+# legend = ax.legend(handles=[p1,p2],labels=['Setosa','Versicolour'],loc='upper left')
+# ax.add_artist(legend1)
+plt.xlim([0,8])
+plt.ylim([0,6])
+
+# plt.xlim([-100,100])
+# plt.ylim([-100,100])
+
+plt.title('Support vector regression in a part of Iris data set')
+plt.xlabel('Sepal length')
+plt.ylabel('Sepal width')
+# plt.legend()
+
+# fig.legend()
+# ani.save(filename='hoge3.gif', writer="imagemagick")
+# ani.save(filename='hoge3.html', writer="imagemagick")
+# ani.save(filename='hoge3.gif', writer="pillow")
+# print('save完了')
+plt.show()
 
 # Graph = Communication(n, 4, 0.3)
 # Graph = Circle_communication(n,0.25)
@@ -97,7 +131,31 @@ for k in range(iteration):
             x1[i] = (Agents[i].x_i[0] * x0[i] + Agents[i].x_i[2]) / (-Agents[i].x_i[1])
             im += plt.plot(x0[i], x1[i])
         ims.append(im)
+        # ims[int(k/save_iteration)] = im
     print(k)
+
+    if (k ==0 or k == 500 or k == 1000):
+        ax = plt.subplot(1,1,1)
+        x1 = [[] for i in range(n)]
+        im = plt.plot()
+        for i in range(n):
+            x1[i] = (Agents[i].x_i[0] * x0[i] + Agents[i].x_i[2]) / (-Agents[i].x_i[1])
+            plt.plot(x0[i], x1[i])
+
+        p1 = plt.scatter(X1[:50, 0], X1[:50, 1], color='r', label='Setosa')
+        p2 = plt.scatter(X1[50:100, 0], X1[50:100, 1], color='b', label='Versicolour')
+        # plt.plot(x0,x1)
+        # plt.legend()
+        legend = ax.legend(handles=[p1, p2], labels=['Setosa', 'Versicolour'], loc='upper left')
+
+        # plt.xlim([0, 8])
+        # plt.ylim([0, 6])
+
+        plt.title('Support vector regression in a part of Iris data set')
+        plt.xlabel('Sepal length')
+        plt.ylabel('Sepal width')
+
+        plt.show()
 
     x_i = Agents[0].x_i
     f = 0
@@ -107,6 +165,30 @@ for k in range(iteration):
     f+= 1 / 2 * lam* np.linalg.norm(x_i) ** 2
     print(f-f_opt)
     f_hist.append(f-f_opt)
+
+    if (f-f_opt) <= 1.0e-2:
+        ax = plt.subplot(1,1,1)
+        x1 = [[] for i in range(n)]
+        im = plt.plot()
+        for i in range(n):
+            x1[i] = (Agents[i].x_i[0] * x0[i] + Agents[i].x_i[2]) / (-Agents[i].x_i[1])
+            plt.plot(x0[i], x1[i])
+
+        p1 = plt.scatter(X1[:50, 0], X1[:50, 1], color='r', label='Setosa')
+        p2 = plt.scatter(X1[50:100, 0], X1[50:100, 1], color='b', label='Versicolour')
+        # plt.plot(x0,x1)
+        # plt.legend()
+        legend = ax.legend(handles=[p1, p2], labels=['Setosa', 'Versicolour'], loc='upper left')
+
+        # plt.xlim([0, 8])
+        # plt.ylim([0, 6])
+
+        plt.title('Support vector regression in a part of Iris data set')
+        plt.xlabel('Sepal length')
+        plt.ylabel('Sepal width')
+
+        plt.show()
+        break
 
 for i in range(n):
     print(Agents[i].x_i)
@@ -131,7 +213,7 @@ plt.ylim([0,6])
 # plt.xlim([-100,100])
 # plt.ylim([-100,100])
 
-plt.title('Logistic regression in a part of Iris data set')
+plt.title('Support vector regression in a part of Iris data set')
 plt.xlabel('Sepal length')
 plt.ylabel('Sepal width')
 # plt.legend()
