@@ -62,7 +62,7 @@ Problem = Solver_hinge_proj(n * size , m, X1,y,lam,epsiron,proj)
 Problem.solve()
 f_opt,x_opt = Problem.send_opt()
 
-x0 = np.linspace(0, 10)
+x0 = np.linspace(-10, 10)
 # x_ax = [[i for j in range(n)] for i in range(10)]
 x1 = []
 im = plt.plot()
@@ -121,7 +121,7 @@ for k in range(iteration):
     for i in range(n):
         Agents[i].update(k)
 
-    x0 = [np.linspace(0, 10) for i in range(n)]
+    x0 = [np.linspace(-10, 10) for i in range(n)]
     # x_ax = [[i for j in range(n)] for i in range(10)]
     x1 = [[]for i in range(n)]
     im = plt.plot()
@@ -148,8 +148,9 @@ for k in range(iteration):
         # plt.legend()
         legend = ax.legend(handles=[p1, p2], labels=['Setosa', 'Versicolour'], loc='upper left')
 
-        # plt.xlim([0, 8])
-        # plt.ylim([0, 6])
+        if not (k== 0):
+            plt.xlim([0, 8])
+            plt.ylim([0, 6])
 
         plt.title('Support vector regression in a part of Iris data set')
         plt.xlabel('Sepal length')
@@ -180,8 +181,8 @@ for k in range(iteration):
         # plt.legend()
         legend = ax.legend(handles=[p1, p2], labels=['Setosa', 'Versicolour'], loc='upper left')
 
-        # plt.xlim([0, 8])
-        # plt.ylim([0, 6])
+        plt.xlim([0, 8])
+        plt.ylim([0, 6])
 
         plt.title('Support vector regression in a part of Iris data set')
         plt.xlabel('Sepal length')
@@ -225,6 +226,6 @@ plt.ylabel('Sepal width')
 # print('save完了')
 plt.show()
 
-plt.plot(f_hist)
+plt.plot(f_hist,label='$f(x_1(k)) -f^*$')
 plt.yscale('log')
 plt.show()

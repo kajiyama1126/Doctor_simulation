@@ -13,7 +13,7 @@ class Communication:  # (頂点数，辺数，辺確率)
         self.count = 0
 
     def make_connected_WS_graph(self):
-        self.G = nx.connected_watts_strogatz_graph(self.n, self.k, self.p,seed=0)
+        self.G = nx.connected_watts_strogatz_graph(self.n, self.k, self.p,seed=1)
         #         lam = nx.laplacian_spectrum(G)
         #         print(nx.adjacency_matrix(G))
         #         print (number_of_nodes(G))
